@@ -15,6 +15,13 @@ Element::Element(string name)
     free = true;
 }
 
+Element& Element::operator=(const Element& copy)
+{
+    name = copy.name;
+    free = copy.free;
+    preferences = copy.preferences;
+}
+
 bool Element::operator==(const Element& e)
 {
     if (e.name == name)//no names will repeat, so if two elements have the same name they are the same element
@@ -29,10 +36,6 @@ string Element::getName()
 
 bool Element::isFree()
 {
-    if (free)
-        cout << "this element is free" << endl;
-    else
-        cout << "this element is not free" << endl;
     return free;
 }
 
@@ -42,10 +45,6 @@ void Element::changeFree()
         free = false;
     else
         free = true;
-    if (free)
-        cout << "this element is free" << endl;
-    else
-        cout << "this element is not free" << endl;
 }
 
 void Element::addPreference(Element pref)
@@ -65,10 +64,11 @@ int Element::findPref(const string& name)
 
 void Element::printPreferences()
 {
-    cout << preferences.at(0).getName();
+    cout << "(" << preferences.at(0).getName();
     for (int i = 1; i < preferences.size(); i++){
         cout << ", " << preferences.at(i).getName();
     }
+    cout << ")" << endl;
 }
 
 vector<Element> Element::getPreferences()
