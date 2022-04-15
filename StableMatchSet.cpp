@@ -15,42 +15,34 @@ void StableMatchSet::determineMatches(SetOfElements a, SetOfElements b)
 
     while (numFree > 0)//while there are still people who need a partner
     {
-        std::cout << "while loop" << std::endl;
-        Element curr;//everything is happening to a temp variable, not actually changing isfree value
         int index;
-        for (int i = 0; i < a.getSize(); i++)
+        for (int i = 0; i < a.getSize(); i++){
             if (a.getElements().at(i).isFree()){//get the first person that needs a partner
-//                curr = a.getElements().at(i);
-//                std::cout << "current (free) person: " << a.getElements().at(i).getName() << std::endl;
                 index = i;
                 break;
             }
-        std::cout << a.getElements().at(index).getName() << std::endl;
+        }
 
         for(int i = 0; i < a.getSize() && a.getElements().at(index).isFree(); i++)
         {
-            std::cout << "for loop" << std::endl;
-            Element partner = a.getElements().at(index).getPreferences().at(i);
+            Element partner = b.getPerson(a.getElements().at(index).getPreferences().at(i).getName());
             if (partner.isFree())//if partner is free, make a match
             {
-                std::cout << "if is running" << std::endl;
                 (a.getElements().at(index)).changeFree();
-                b.getPerson(partner.getName()).changeFree();//change status of partner too
-                addMatch(a.getElements().at(index), partner);
-                if (a.getElements().at(index).isFree())
-                    std::cout << a.getElements().at(index).getName() << " is free" << std::endl;
+                b.getPerson(partner.getName()).changeFree();//change status of both elements
+                addMatch(a.getElements().at(index), b.getPerson(partner.getName()));
                 numFree--;
             }
             else//does partner prefer curr over current partner?
             {
-                std::cout << "else is running?" << std::endl;
                 Element currPartner = findPartner(partner);//find current partner of partner
 
                 if (!prefers(partner.getPreferences(), a.getElements().at(index), currPartner))//prefers curr over currPartner
                 {
-                    addMatch(curr, partner);
-                    a.getElements().at(index).changeFree();
-                    currPartner.changeFree();
+                    deleteMatch(partner);//remove old pair from matches vector
+                    (a.getElements().at(index)).changeFree();
+                    addMatch(a.getElements().at(index), b.getPerson(partner.getName()));//add new pair
+                    a.getPerson(currPartner.getName()).changeFree();//previous partner is now free again
                 }
             }
         }
@@ -59,25 +51,36 @@ void StableMatchSet::determineMatches(SetOfElements a, SetOfElements b)
 
 void StableMatchSet::addMatch(Element a, Element b)
 {
-    std::cout << "add match" << std::endl;
     vector<Element> v;
     v.push_back(a);
     v.push_back(b);
     matches.push_back(v);
 }
 
-bool StableMatchSet::matchesAreStable()
+void StableMatchSet::deleteMatch(Element a)
+{
+    for (int i = 0; i < matches.size(); i++)
+    {
+        if (matches.at(i).at(0) == a || matches.at(i).at(1) == a){
+            matches.erase(matches.begin() + i);
+            return;
+        }
+    }
+    std::cout << "No pair found" << std::endl;
+}
+
+bool StableMatchSet::matchesAreStable(SetOfElements a, SetOfElements b)
 {
     for (int i = 0; i < matches.size(); i++)
     {
         Element curr = matches.at(i).at(0);
         Element partner = matches.at(i).at(1);
         int p = curr.findPref(partner.getName());//ranking of current partner
-        for (int j = 0; j < curr.getPreferences().size(); j++)
+        for (int j = 0; j < p; j++)
         {
             Element pref = curr.getPreferences().at(j);
-            Element p = findPartner(pref);//find current partner for pref
-            if (prefers(pref.getPreferences(), p, curr))//prefers someone else over their current partner
+            Element currPrefPartner = findPartner(pref);//find current partner for pref
+            if (prefers(b.getPerson(pref.getName()).getPreferences(), currPrefPartner, curr))//prefers someone else over their current partner
             {
                 std::cout << "Unstable match found" << std::endl;
                 return false;//match unstable
@@ -90,7 +93,6 @@ bool StableMatchSet::matchesAreStable()
 
 bool StableMatchSet::prefers(vector<Element> set, Element a, Element b)
 {
-    std::cout << "prefers method" << std::endl;
     int indexA = -1;//pref. position of b
     int indexB = -1;//pref. position of b1
 
@@ -103,21 +105,16 @@ bool StableMatchSet::prefers(vector<Element> set, Element a, Element b)
             indexB = i;
     }
 
-    std::cout << "index of a: " << indexA << std::endl;
-    std::cout << "index of b: " << indexB << std::endl;
     //b has lower index = higher preference
     //b < a means a prefers b over a
     if (indexB < indexA){
-        std::cout << "Prefers " << b.getName() << " over " << a.getName() << std::endl;
         return true;
     }
-    std::cout << "Prefers " << a.getName() << " over " << b.getName() << std::endl;
     return false;
 }
 
 Element StableMatchSet::findPartner(Element& person)
 {
-    std::cout << "person object is " << person.getName() << std::endl;
     Element partner;
     for (int i = 0; i < matches.size(); i++)//go through each vector within the vector
     {
@@ -133,10 +130,6 @@ Element StableMatchSet::findPartner(Element& person)
         }
     }
 
-    if (partner.getName() == "")//not initialized
-        std::cout << "no partner found" << std::endl;
-    else
-        std::cout << "Found partner name: " << partner.getName() << std::endl;
     return partner;
 }
 
