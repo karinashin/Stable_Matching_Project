@@ -11,36 +11,27 @@ int main(int argc, char** argv) {
     if (!input.is_open())
         cout << "not open";
     SetOfElements setA(input);
+    cout << "Set A contains: " << endl;
+    setA.printSet();
     input.close();
 
     input.open(argv[2]);
     if (!input.is_open())
         cout << "not open";
     SetOfElements setB(input);
+    cout << "Set B contains: " << endl;
+    setB.printSet();
     input.close();
-
-//    setA.printSet();
-//    setB.printSet();
-//    Element a("Tom");
-//    if (a.isFree())
-//        std::cout << "a is free" << std::endl;
-//    else
-//        std::cout << "a is not free" << std::endl;
-//    a.changeFree();
-//    if (a.isFree())
-//        std::cout << "a is free" << std::endl;
-//    else
-//        std::cout << "a is not free" << std::endl;
-//    a.changeFree();
-//    if (a.isFree())
-//        std::cout << "a is free" << std::endl;
-//    else
-//        std::cout << "a is not free" << std::endl;
-
 
     StableMatchSet match;
     match.determineMatches(setA, setB);
-//    match.matchesAreStable();
     match.printMatches();
+
+    cout << "Result of verification function: ";
+    if (match.matchesAreStable(setA, setB))
+        cout << "true" << endl;
+    else
+        cout << "false" << endl;
+
     return 0;
 }
