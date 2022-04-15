@@ -19,6 +19,7 @@ private:
 public:
     Element();
     Element(string name);
+    Element& operator=(const Element& copy);
 
     bool operator==(const Element& e);
     string getName();
