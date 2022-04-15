@@ -17,21 +17,19 @@ SetOfElements::SetOfElements(ifstream& input)
         getline(input, line);
         int colon = line.find(':');
         string name = line.substr(0, colon);
-        line = line.substr(colon + 2);//gets rid of space after colon
+        line = line.substr(colon + 1);
         Element e(name);
 
         int comma = line.find(',');
         while (comma != -1)
         {
             e.addPreference(line.substr(0, comma));
-            line = line.substr(comma + 2);
+            line = line.substr(comma + 1);
             comma = line.find(',');
         }
         e.addPreference(line.substr(0, comma));
         addElement(e);
     }
-
-//    std::cout << "size: " << setSize << std::endl;
 }
 
 void SetOfElements::addElement(Element e)
@@ -65,7 +63,6 @@ void SetOfElements::printSet()
     for (int n = 0; n < elementsInSet.size(); n++){
         cout << elementsInSet.at(n).getName() << ": ";
         elementsInSet.at(n).printPreferences();
-        cout << endl;
     }
     cout << endl;
 }
